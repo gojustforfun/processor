@@ -3,21 +3,32 @@ package processor
 import (
 	"testing"
 
-	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/suite"
 )
 
-func TestVerifierReceivesInput(t *testing.T) {
-	handler, out := setup()
-	handler.Listen()
-	assert.Equal(t, 1, <-out)
+func TestVerifyHandler(t *testing.T) {
+	suite.Run(t, new(VerifyHandlerTestSuite))
 }
 
-func setup() (handler *VerifyHandler, out chan interface{}) {
-	in := make(chan interface{}, 10)
-	out = make(chan interface{}, 10)
-	handler = NewVerifier(in, out)
+type VerifyHandlerTestSuite struct {
+	suite.Suite
 	
-	in <- 1
-	close(in)
-	return 
+	in      chan interface{}
+	out     chan interface{}
+	handler *VerifyHandler
+}
+
+func (s *VerifyHandlerTestSuite) SetupSuite() {
+	s.in = make(chan interface{}, 10)
+	s.out = make(chan interface{}, 10)
+	s.handler = NewVerifier(s.in, s.out)
+}
+
+func (s *VerifyHandlerTestSuite) TestVerifierReceivesInput() {
+	s.in <- 1
+	close(s.in)
+
+	s.handler.Listen()
+
+	s.Equal(1, <-s.out)
 }
