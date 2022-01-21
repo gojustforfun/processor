@@ -34,17 +34,17 @@ func (s *VerifyHandlerTestSuite) TestVerifierReceivesInput() {
 	s.handler.Handle()
 
 	s.Same(envelope, <-s.out)
-	s.Same(envelope, s.application.input)
+	s.Equal(envelope.Input, s.application.input)
 }
 
 type FakeVerifier struct {
-	input *Envelope
+	input AddressInput
 }
 
 func NewFakeVerifier() *FakeVerifier {
 	return &FakeVerifier{}
 }
 
-func (f *FakeVerifier) Verify(i *Envelope) {
+func (f *FakeVerifier) Verify(i AddressInput) {
 	f.input = i
 }
