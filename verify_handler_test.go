@@ -23,7 +23,7 @@ func (s *VerifyHandlerTestSuite) SetupSuite() {
 	s.in = make(chan interface{}, 10)
 	s.out = make(chan interface{}, 10)
 	s.application = NewFakeVerifier()
-	s.handler = NewVerifier(s.in, s.out, s.application)
+	s.handler = NewVerifierHandler(s.in, s.out, s.application)
 }
 
 func (s *VerifyHandlerTestSuite) TestVerifierReceivesInput() {
@@ -42,4 +42,8 @@ type FakeVerifier struct {
 
 func NewFakeVerifier() *FakeVerifier {
 	return &FakeVerifier{}
+}
+
+func (f *FakeVerifier) Verify(i interface{}) {
+	f.input = i
 }
