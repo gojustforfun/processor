@@ -13,37 +13,38 @@ func TestVerifyHandler(t *testing.T) {
 type VerifyHandlerTestSuite struct {
 	suite.Suite
 
-	in          chan interface{}
-	out         chan interface{}
+	in          chan *Envelope
+	out         chan *Envelope
 	application *FakeVerifier
 	handler     *VerifyHandler
 }
 
 func (s *VerifyHandlerTestSuite) SetupSuite() {
-	s.in = make(chan interface{}, 10)
-	s.out = make(chan interface{}, 10)
+	s.in = make(chan *Envelope, 10)
+	s.out = make(chan *Envelope, 10)
 	s.application = NewFakeVerifier()
 	s.handler = NewVerifierHandler(s.in, s.out, s.application)
 }
 
 func (s *VerifyHandlerTestSuite) TestVerifierReceivesInput() {
-	s.in <- 2
+	envelope := &Envelope{}
+	s.in <- envelope
 	close(s.in)
 
 	s.handler.Handle()
 
-	s.Equal(2, <-s.out)
-	s.Equal(2, s.application.input)
+	s.Same(envelope, <-s.out)
+	s.Same(envelope, s.application.input)
 }
 
 type FakeVerifier struct {
-	input interface{}
+	input *Envelope
 }
 
 func NewFakeVerifier() *FakeVerifier {
 	return &FakeVerifier{}
 }
 
-func (f *FakeVerifier) Verify(i interface{}) {
+func (f *FakeVerifier) Verify(i *Envelope) {
 	f.input = i
 }
