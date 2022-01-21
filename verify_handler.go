@@ -1,17 +1,17 @@
 package processor
 
-type Verifier struct {
+type VerifyHandler struct {
 	in  chan interface{}
 	out chan interface{}
 }
 
-func NewVerifier(in, out chan interface{}) *Verifier {
-	return &Verifier{
+func NewVerifier(in, out chan interface{}) *VerifyHandler {
+	return &VerifyHandler{
 		in:  in,
 		out: out,
 	}
 }
 
-func (v *Verifier) Listen() {
+func (v *VerifyHandler) Listen() {
 	v.out <- 1
 }
