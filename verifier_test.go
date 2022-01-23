@@ -26,14 +26,20 @@ func (s *VerifierTestSuite) SetupSuite() {
 
 func (s *VerifierTestSuite) TestRequestComposedProperly() {
 	input := processor.AddressInput{
-		Street1: "street1",
+		Street1: "Street1",
+		City:    "City",
+		State:   "State",
+		ZIPCode: "ZIPcode",
 	}
 
 	s.verifier.Verify(input)
 
 	s.Equal(http.MethodGet, s.client.request.Method)
 	s.Equal("/street-address", s.client.request.URL.Path)
-	s.EqualQueryStringValue("street", "street1")
+	s.EqualQueryStringValue("street", "Street1")
+	s.EqualQueryStringValue("city", "City")
+	s.EqualQueryStringValue("state", "State")
+	s.EqualQueryStringValue("zipcode", "ZIPcode")
 }
 
 func (s *VerifierTestSuite) EqualQueryStringValue(key string, val string) {
