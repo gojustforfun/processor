@@ -30,6 +30,7 @@ func (s *VerifyHandlerTestSuite) SetupSuite() {
 func (s *VerifyHandlerTestSuite) TestVerifierReceivesInput() {
 
 	envelope := s.enqueueEnvelope("street")
+	close(s.in)
 
 	s.handler.Handle()
 
@@ -47,8 +48,22 @@ func (s *VerifyHandlerTestSuite) enqueueEnvelope(inputStreet string) *Envelope {
 	return envelope
 }
 
+func (s *VerifyHandlerTestSuite) TestInputQueueDrained() {
+
+	envelope1 := s.enqueueEnvelope("41")
+	envelope2 := s.enqueueEnvelope("42")
+	envelope3 := s.enqueueEnvelope("43")
+	close(s.in)
+
+	s.handler.Handle()
+
+	s.Same(envelope1, <-s.out)
+	s.Same(envelope2, <-s.out)
+	s.Same(envelope3, <-s.out)
+}
+
 type FakeVerifier struct {
-	input  AddressInput
+	input AddressInput
 }
 
 func NewFakeVerifier() *FakeVerifier {
