@@ -42,6 +42,7 @@ type FakeHTTPClient struct {
 	request *http.Request
 }
 
-func (f *FakeHTTPClient) Do(r *http.Request) (*http.Response, error) {
+func (f *FakeHTTPClient) Do(request *http.Request) (*http.Response, error) {
+	f.request = request
 	return nil, nil
 }
