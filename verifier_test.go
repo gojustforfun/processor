@@ -31,7 +31,14 @@ func (s *VerifierTestSuite) TestRequestComposedProperly() {
 
 	s.verifier.Verify(input)
 
-	s.Equal("street=street1", s.client.request.URL.RawQuery)
+	s.Equal(http.MethodGet, s.client.request.Method)
+	s.Equal("/street-address", s.client.request.URL.Path)
+	s.EqualQueryStringValue("street", "street1")
+}
+
+func (s *VerifierTestSuite) EqualQueryStringValue(key string, val string) {
+	query := s.client.request.URL.Query()
+	s.Equal(val, query.Get(key))
 }
 
 func NewFakeHTTPClient() *FakeHTTPClient {

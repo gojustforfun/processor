@@ -21,11 +21,10 @@ func NewSmartyVerifier(client HTTPClient) *SmartyVerifier {
 
 func (s *SmartyVerifier) Verify(input AddressInput) AddressOutput {
 
-	values := url.Values{}
-	values.Set("street", input.Street1)
+	query := url.Values{}
+	query.Set("street", input.Street1)
 
-	s.client.Do(&http.Request{URL: &url.URL{
-		RawQuery: values.Encode(),
-	}})
+	request, _ := http.NewRequest(http.MethodGet, "/street-address?" + query.Encode(), nil)
+	s.client.Do(request)
 	return AddressOutput{}
 }
