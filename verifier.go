@@ -27,7 +27,7 @@ func (s *SmartyVerifier) Verify(input AddressInput) AddressOutput {
 	query.Set("state", input.State)
 	query.Set("zipcode", input.ZIPCode)
 
-	request, _ := http.NewRequest(http.MethodGet, "/street-address?" + query.Encode(), nil)
+	request, _ := http.NewRequest(http.MethodGet, "/street-address?"+query.Encode(), nil)
 	s.client.Do(request)
 	return AddressOutput{}
 }
