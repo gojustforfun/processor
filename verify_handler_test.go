@@ -1,6 +1,7 @@
 package processor
 
 import (
+	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/suite"
@@ -27,28 +28,27 @@ func (s *VerifyHandlerTestSuite) SetupSuite() {
 }
 
 func (s *VerifyHandlerTestSuite) TestVerifierReceivesInput() {
-	envelope := &Envelope{
-		Input: AddressInput{
-			Street1: "42",
-		},
-	}
-	s.application.output = AddressOutput{
-		DeliveryLine1: "DeliveryLine1",
-	}
 
-	s.in <- envelope
-	close(s.in)
+	envelope := s.enqueueEnvelope("street")
 
 	s.handler.Handle()
 
 	s.Same(envelope, <-s.out)
-	s.Equal("42", s.application.input.Street1)
-	s.Equal("DeliveryLine1", envelope.Output.DeliveryLine1)
+	s.Equal("STREET", envelope.Output.DeliveryLine1)
+}
+
+func (s *VerifyHandlerTestSuite) enqueueEnvelope(inputStreet string) *Envelope {
+	envelope := &Envelope{
+		Input: AddressInput{
+			Street1: inputStreet,
+		},
+	}
+	s.in <- envelope
+	return envelope
 }
 
 type FakeVerifier struct {
-	input AddressInput
-	output AddressOutput
+	input  AddressInput
 }
 
 func NewFakeVerifier() *FakeVerifier {
@@ -57,5 +57,5 @@ func NewFakeVerifier() *FakeVerifier {
 
 func (f *FakeVerifier) Verify(i AddressInput) AddressOutput {
 	f.input = i
-	return f.output
+	return AddressOutput{DeliveryLine1: strings.ToUpper(i.Street1)}
 }
