@@ -27,24 +27,35 @@ func (s *VerifyHandlerTestSuite) SetupSuite() {
 }
 
 func (s *VerifyHandlerTestSuite) TestVerifierReceivesInput() {
-	envelope := &Envelope{}
+	envelope := &Envelope{
+		Input: AddressInput{
+			Street1: "42",
+		},
+	}
+	s.application.output = AddressOutput{
+		DeliveryLine1: "DeliveryLine1",
+	}
+
 	s.in <- envelope
 	close(s.in)
 
 	s.handler.Handle()
 
 	s.Same(envelope, <-s.out)
-	s.Equal(envelope.Input, s.application.input)
+	s.Equal("42", s.application.input.Street1)
+	s.Equal("DeliveryLine1", envelope.Output.DeliveryLine1)
 }
 
 type FakeVerifier struct {
 	input AddressInput
+	output AddressOutput
 }
 
 func NewFakeVerifier() *FakeVerifier {
 	return &FakeVerifier{}
 }
 
-func (f *FakeVerifier) Verify(i AddressInput) {
+func (f *FakeVerifier) Verify(i AddressInput) AddressOutput {
 	f.input = i
+	return f.output
 }
