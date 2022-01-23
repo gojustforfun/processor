@@ -20,7 +20,7 @@ type VerifyHandlerTestSuite struct {
 	handler     *VerifyHandler
 }
 
-func (s *VerifyHandlerTestSuite) SetupSuite() {
+func (s *VerifyHandlerTestSuite) SetupTest() {
 	s.in = make(chan *Envelope, 10)
 	s.out = make(chan *Envelope, 10)
 	s.application = NewFakeVerifier()
