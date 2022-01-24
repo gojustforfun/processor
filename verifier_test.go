@@ -56,9 +56,23 @@ func (s *VerifierTestSuite) TestResponseParsed() {
 	addressOutput := s.verifier.Verify(processor.AddressInput{})
 
 	s.Equal("1 Santa Claus Ln", addressOutput.DeliveryLine1)
+	s.Equal("North Pole AK 99705-9901", addressOutput.LastLine)
+	s.Equal("North Pole", addressOutput.City)
+	s.Equal("AK", addressOutput.State)
+	s.Equal("99705", addressOutput.ZIPCode)
 }
 
-const rawJSONInput = `[{"delivery_line_1":"1 Santa Claus Ln","last_line":"North Pole AK 99705-9901"}]`
+const rawJSONInput = `[
+	{
+		"delivery_line_1":"1 Santa Claus Ln",
+		"last_line":"North Pole AK 99705-9901",
+		"components":{
+			"city_name": "North Pole",
+			"state_abbreviation": "AK",
+			"zipcode": "99705"
+		}
+	}
+]`
 
 func NewFakeHTTPClient() *FakeHTTPClient {
 	return &FakeHTTPClient{}
