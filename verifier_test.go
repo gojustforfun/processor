@@ -33,6 +33,7 @@ func (s *VerifierTestSuite) TestRequestComposedProperly() {
 		State:   "State",
 		ZIPCode: "ZIPcode",
 	}
+	s.client.ConfigureResponseInfo(`[{}]`, http.StatusOK, nil)
 
 	s.verifier.Verify(input)
 

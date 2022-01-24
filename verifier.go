@@ -1,6 +1,7 @@
 package processor
 
 import (
+	"encoding/json"
 	"net/http"
 	"net/url"
 )
@@ -28,6 +29,15 @@ func (s *SmartyVerifier) Verify(input AddressInput) AddressOutput {
 	query.Set("zipcode", input.ZIPCode)
 
 	request, _ := http.NewRequest(http.MethodGet, "/street-address?"+query.Encode(), nil)
-	s.client.Do(request)
-	return AddressOutput{}
+	response, _ := s.client.Do(request)
+
+	var output []Candidate
+	json.NewDecoder(response.Body).Decode(&output)
+	return AddressOutput{
+		DeliveryLine1: output[0].DeliveryLine1,
+	}
+}
+
+type Candidate struct {
+	DeliveryLine1 string `json:"delivery_line_1"`
 }
