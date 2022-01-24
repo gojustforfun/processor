@@ -49,6 +49,16 @@ func (s *VerifierTestSuite) EqualQueryStringValue(key string, val string) {
 	s.Equal(val, query.Get(key))
 }
 
+func (s *VerifierTestSuite) TestResponseParsed() {
+	s.client.ConfigureResponseInfo(rawJSONInput, http.StatusOK, nil)
+
+	addressOutput := s.verifier.Verify(processor.AddressInput{})
+
+	s.Equal("1 Santa Claus Ln", addressOutput.DeliveryLine1)
+}
+
+const rawJSONInput = `[{"delivery_line_1":"1 Santa Claus Ln","last_line":"North Pole AK 99705-9901"}]`
+
 func NewFakeHTTPClient() *FakeHTTPClient {
 	return &FakeHTTPClient{}
 }
