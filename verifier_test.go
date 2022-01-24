@@ -1,6 +1,8 @@
 package processor_test
 
 import (
+	"bytes"
+	"io"
 	"net/http"
 	"testing"
 
@@ -36,10 +38,10 @@ func (s *VerifierTestSuite) TestRequestComposedProperly() {
 
 	s.Equal(http.MethodGet, s.client.request.Method)
 	s.Equal("/street-address", s.client.request.URL.Path)
-	s.EqualQueryStringValue("street", "Street1")
-	s.EqualQueryStringValue("city", "City")
-	s.EqualQueryStringValue("state", "State")
-	s.EqualQueryStringValue("zipcode", "ZIPcode")
+	s.EqualQueryStringValue("street", input.Street1)
+	s.EqualQueryStringValue("city", input.City)
+	s.EqualQueryStringValue("state", input.State)
+	s.EqualQueryStringValue("zipcode", input.ZIPCode)
 }
 
 func (s *VerifierTestSuite) EqualQueryStringValue(key string, val string) {
@@ -52,10 +54,20 @@ func NewFakeHTTPClient() *FakeHTTPClient {
 }
 
 type FakeHTTPClient struct {
-	request *http.Request
+	request  *http.Request
+	response *http.Response
+	err      error
+}
+
+func (f *FakeHTTPClient) ConfigureResponseInfo(responseText string, statusCode int, err error) {
+	f.response = &http.Response{
+		Body:       io.NopCloser(bytes.NewBufferString(responseText)),
+		StatusCode: statusCode,
+	}
+	f.err = err
 }
 
 func (f *FakeHTTPClient) Do(request *http.Request) (*http.Response, error) {
 	f.request = request
-	return nil, nil
+	return f.response, f.err
 }
