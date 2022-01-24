@@ -50,9 +50,19 @@ func (s *SmartyVerifier) decodeResponse(response *http.Response) (output []Candi
 func (s *SmartyVerifier) translateCandidate(candidate Candidate) AddressOutput {
 	return AddressOutput{
 		DeliveryLine1: candidate.DeliveryLine1,
+		LastLine:      candidate.LastLine,
+		City:          candidate.Components.City,
+		State:         candidate.Components.State,
+		ZIPCode:       candidate.Components.ZIPCode,
 	}
 }
 
 type Candidate struct {
 	DeliveryLine1 string `json:"delivery_line_1"`
+	LastLine      string `json:"last_line"`
+	Components    struct {
+		City    string `json:"city_name"`
+		State   string `json:"state_abbreviation"`
+		ZIPCode string `json:"zipcode"`
+	} `json:"components"`
 }
