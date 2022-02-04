@@ -43,7 +43,9 @@ func (s *SmartyVerifier) buildRequest(input AddressInput) *http.Request {
 }
 
 func (s *SmartyVerifier) decodeResponse(response *http.Response) (output []Candidate) {
-	json.NewDecoder(response.Body).Decode(&output)
+	if response != nil {
+		json.NewDecoder(response.Body).Decode(&output)
+	}
 	return output
 }
 

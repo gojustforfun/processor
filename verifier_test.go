@@ -2,6 +2,7 @@ package processor_test
 
 import (
 	"bytes"
+	"errors"
 	"io"
 	"net/http"
 	"testing"
@@ -82,6 +83,12 @@ func (s *VerifierTestSuite) TestMalformedJSONHandled() {
 
 const malformedRawJSONOutput = `I am not JSON`
 
+func (s *VerifierTestSuite) TestHTTPErrorHandled() {
+	s.client.ConfigureResponseInfo("", 0, errors.New("Gophers!"))
+	result := s.verifier.Verify(processor.AddressInput{})
+	s.Equal("Invalid API Response", result.Status)
+}
+
 func NewFakeHTTPClient() *FakeHTTPClient {
 	return &FakeHTTPClient{}
 }
@@ -93,9 +100,11 @@ type FakeHTTPClient struct {
 }
 
 func (f *FakeHTTPClient) ConfigureResponseInfo(responseText string, statusCode int, err error) {
-	f.response = &http.Response{
-		Body:       io.NopCloser(bytes.NewBufferString(responseText)),
-		StatusCode: statusCode,
+	if err == nil {
+		f.response = &http.Response{
+			Body:       io.NopCloser(bytes.NewBufferString(responseText)),
+			StatusCode: statusCode,
+		}
 	}
 	f.err = err
 }
