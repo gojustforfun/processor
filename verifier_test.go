@@ -3,7 +3,6 @@ package processor_test
 import (
 	"bytes"
 	"errors"
-	"io"
 	"net/http"
 	"testing"
 
@@ -89,6 +88,14 @@ func (s *VerifierTestSuite) TestHTTPErrorHandled() {
 	s.Equal("Invalid API Response", result.Status)
 }
 
+func (s *VerifierTestSuite) TestHTTPResponseBodyClosed() {
+	s.client.ConfigureResponseInfo(rawJSONInput, http.StatusOK, nil)
+	s.verifier.Verify(processor.AddressInput{})
+	body, ok := s.client.response.Body.(*SpyBuffer)
+	s.Equal(true, ok)
+	s.Equal(1, body.Closed)
+}
+
 func NewFakeHTTPClient() *FakeHTTPClient {
 	return &FakeHTTPClient{}
 }
@@ -102,7 +109,7 @@ type FakeHTTPClient struct {
 func (f *FakeHTTPClient) ConfigureResponseInfo(responseText string, statusCode int, err error) {
 	if err == nil {
 		f.response = &http.Response{
-			Body:       io.NopCloser(bytes.NewBufferString(responseText)),
+			Body:       NewSpyBuffer(responseText),
 			StatusCode: statusCode,
 		}
 	}
@@ -112,4 +119,20 @@ func (f *FakeHTTPClient) ConfigureResponseInfo(responseText string, statusCode i
 func (f *FakeHTTPClient) Do(request *http.Request) (*http.Response, error) {
 	f.request = request
 	return f.response, f.err
+}
+
+func NewSpyBuffer(s string) *SpyBuffer {
+	return &SpyBuffer{
+		Buffer: *bytes.NewBufferString(s),
+	}
+}
+
+type SpyBuffer struct {
+	bytes.Buffer
+	Closed int
+}
+
+func (s *SpyBuffer) Close() error {
+	s.Closed++
+	return nil
 }
