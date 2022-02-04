@@ -74,6 +74,14 @@ const rawJSONInput = `[
 	}
 ]`
 
+func (s *VerifierTestSuite) TestMalformedJSONHandled() {
+	s.client.ConfigureResponseInfo(malformedRawJSONOutput, http.StatusOK, nil)
+	result := s.verifier.Verify(processor.AddressInput{})
+	s.Equal("Invalid API Response", result.Status)
+}
+
+const malformedRawJSONOutput = `I am not JSON`
+
 func NewFakeHTTPClient() *FakeHTTPClient {
 	return &FakeHTTPClient{}
 }

@@ -28,7 +28,7 @@ func (s *SmartyVerifier) Verify(input AddressInput) AddressOutput {
 
 	output := s.decodeResponse(response)
 
-	return s.translateCandidate(output[0])
+	return s.translateCandidate(output)
 }
 
 func (s *SmartyVerifier) buildRequest(input AddressInput) *http.Request {
@@ -47,7 +47,12 @@ func (s *SmartyVerifier) decodeResponse(response *http.Response) (output []Candi
 	return output
 }
 
-func (s *SmartyVerifier) translateCandidate(candidate Candidate) AddressOutput {
+func (s *SmartyVerifier) translateCandidate(candidates []Candidate) AddressOutput {
+	if len(candidates) == 0 {
+		return AddressOutput{Status: "Invalid API Response"}
+	}
+	candidate := candidates[0]
+
 	return AddressOutput{
 		DeliveryLine1: candidate.DeliveryLine1,
 		LastLine:      candidate.LastLine,
