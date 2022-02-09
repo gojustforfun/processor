@@ -134,5 +134,6 @@ type SpyBuffer struct {
 
 func (s *SpyBuffer) Close() error {
 	s.Closed++
+	s.Buffer.Reset()
 	return nil
 }
